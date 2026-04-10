@@ -1,5 +1,6 @@
 import os
-from langchain_anthropic import ChatAnthropic
+from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.tools import tool
@@ -7,6 +8,9 @@ from langchain_core.tools import tool
 from app.models.feedback import FeedbackRecord
 from app.services import sentiment as sentiment_svc
 from app.services import trend_detection, event_detection, prediction, persona
+
+# Load .env so OPENAI_API_KEY is available when running via uvicorn
+load_dotenv()
 
 
 def build_agent(records: list[FeedbackRecord]) -> AgentExecutor:
@@ -64,10 +68,11 @@ def build_agent(records: list[FeedbackRecord]) -> AgentExecutor:
         ]
         return "\n".join(lines) if lines else "No persona data available."
 
-    llm = ChatAnthropic(
-        model="claude-haiku-4-5-20251001",
-        api_key=os.environ.get("ANTHROPIC_API_KEY"),
+    llm = ChatOpenAI(
+        model="gpt-4o-mini",
+        api_key=os.environ.get("OPENAI_API_KEY"),
         max_tokens=2048,
+        temperature=0.3,
     )
 
     tools = [
@@ -84,13 +89,14 @@ def build_agent(records: list[FeedbackRecord]) -> AgentExecutor:
             (
                 "You are Signal360's retail intelligence AI for Nike. "
                 "You analyze omni-channel customer feedback and produce actionable business intelligence. "
-                "Use the available tools to gather data, then write a structured report with these sections:\n\n"
+                "Use ALL available tools to gather data before writing your report.\n\n"
+                "Structure your report with these sections:\n\n"
                 "## Executive Summary\n"
                 "## Top 3 Critical Issues (with root cause analysis)\n"
                 "## Recommended Actions (prioritized, with expected impact)\n"
                 "## Risk Outlook\n\n"
                 "Be concise, data-driven, and specific to Nike operations. "
-                "Always cite numbers from the tools."
+                "Always cite numbers from the tools (e.g. exact counts, percentages, scores)."
             ),
         ),
         ("human", "{input}"),
