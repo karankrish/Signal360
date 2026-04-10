@@ -7,7 +7,7 @@ from app.services import sentiment as sentiment_svc
 router = APIRouter()
 
 DATA_DIR = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "data")
+    os.path.join(os.path.dirname(__file__), "..", "..", "..", "data")
 )
 
 
