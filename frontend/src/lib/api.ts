@@ -88,6 +88,22 @@ export const apiClient = {
 
   generateInsights: () =>
     api.post<{ report: string }>('/insights'),
+
+  getWordcloud: (topN = 80) =>
+    api.get<{ words: { text: string; value: number; sentiment: string }[] }>(
+      `/wordcloud?top_n=${topN}`
+    ),
+
+  getTopics: (nTopics = 5) =>
+    api.get<{
+      topics: { topic_id: number; label: string; keywords: string[]; relevance: number }[]
+    }>(`/topics?n_topics=${nTopics}`),
+
+  getSentimentKeywords: () =>
+    api.get<{
+      positive: { text: string; count: number }[]
+      negative: { text: string; count: number }[]
+    }>('/sentiment-keywords'),
 }
 
 export default apiClient

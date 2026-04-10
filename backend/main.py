@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.controllers import feedback, sentiment, trends, events, channels, personas, risks, insights, summary
+from app.controllers import feedback, sentiment, trends, events, channels, personas, risks, insights, summary, text_analysis as text_analysis_ctrl
 from app.repositories.feedback_repo import feedback_repo
 from app.services.ingestion import load_and_preprocess
 from app.services import sentiment as sentiment_svc
@@ -49,6 +49,7 @@ app.include_router(personas.router, prefix="/api")
 app.include_router(risks.router, prefix="/api")
 app.include_router(insights.router, prefix="/api")
 app.include_router(summary.router, prefix="/api")
+app.include_router(text_analysis_ctrl.router, prefix="/api")
 
 
 @app.get("/")

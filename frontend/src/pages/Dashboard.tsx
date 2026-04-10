@@ -14,9 +14,11 @@ import EventAlerts from '../components/EventAlerts'
 import PersonaInsights from '../components/PersonaInsights'
 import RiskForecast from '../components/RiskForecast'
 import AIRecommendations from '../components/AIRecommendations'
+import WordCloud from '../components/WordCloud'
+import TopicModeling from '../components/TopicModeling'
 import { sentimentColor } from '../lib/utils'
 
-const TABS = ['Overview', 'Trends', 'Events', 'Personas', 'Risks', 'AI Report']
+const TABS = ['Overview', 'Trends', 'Events', 'Personas', 'Risks', 'Text Analysis', 'AI Report']
 
 interface DashboardData {
   summary: Summary
@@ -213,6 +215,13 @@ export default function Dashboard() {
           <div>
             <h2 className="text-lg font-semibold text-gray-800 mb-4">Risk Assessment & Forecast</h2>
             <RiskForecast risks={data.risks} forecast={data.forecast} />
+          </div>
+        )}
+
+        {tab === 'Text Analysis' && (
+          <div className="space-y-6">
+            <WordCloud showSentimentSplit />
+            <TopicModeling />
           </div>
         )}
 
