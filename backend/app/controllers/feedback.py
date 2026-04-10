@@ -1,0 +1,47 @@
+import os
+from fastapi import APIRouter, HTTPException, Query
+from app.repositories.feedback_repo import feedback_repo
+from app.services.ingestion import load_and_preprocess
+from app.services import sentiment as sentiment_svc
+
+router = APIRouter()
+
+DATA_DIR = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "..", "..", "data")
+)
+
+
+@router.post("/ingest")
+def ingest_data(filename: str = Query(default="data.json.txt")):
+    """Load a data file from /data/ directory and run sentiment analysis."""
+    file_path = os.path.join(DATA_DIR, filename)
+    if not os.path.exists(file_path):
+        raise HTTPException(status_code=404, detail=f"File not found: {filename}")
+    records = load_and_preprocess(file_path)
+    records = sentiment_svc.analyze_batch(records)
+    feedback_repo.load(records)
+    return {"status": "ok", "records_loaded": len(records), "file": filename}
+
+
+@router.get("/feedback")
+def get_feedback(
+    page: int = Query(default=1, ge=1),
+    page_size: int = Query(default=50, le=200),
+    channel: str = Query(default=None),
+    segment: str = Query(default=None),
+):
+    """Return paginated feedback records with computed sentiment."""
+    records = feedback_repo.get_all()
+    if channel:
+        records = [r for r in records if r.channel == channel]
+    if segment:
+        records = [r for r in records if r.customer_segment == segment]
+    total = len(records)
+    start = (page - 1) * page_size
+    end = start + page_size
+    return {
+        "total": total,
+        "page": page,
+        "page_size": page_size,
+        "records": [r.model_dump() for r in records[start:end]],
+    }
