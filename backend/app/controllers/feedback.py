@@ -12,7 +12,7 @@ DATA_DIR = os.path.abspath(
 
 
 @router.post("/ingest")
-def ingest_data(filename: str = Query(default="data.json.txt")):
+def ingest_data(filename: str = Query(default="data.json")):
     """Load a data file from /data/ directory and run sentiment analysis."""
     file_path = os.path.join(DATA_DIR, filename)
     if not os.path.exists(file_path):

@@ -8,7 +8,7 @@ from app.repositories.feedback_repo import feedback_repo
 from app.services.ingestion import load_and_preprocess
 from app.services import sentiment as sentiment_svc
 
-DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "data.json.txt")
+DATA_FILE = os.path.join(os.path.dirname(__file__), "..", "data", "data.json")
 
 
 @asynccontextmanager

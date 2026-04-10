@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom'
 import apiClient from '../lib/api'
 
 const DATA_FILES = [
-  { label: 'Nike Feedback (150 records)', value: 'data.json.txt' },
-  { label: 'Amazon Feedback (16 records)', value: 'amzdata.json.txt' },
+  { label: 'Nike Feedback (150 records)', value: 'data.json' },
+  { label: 'Amazon Feedback (16 records)', value: 'amzdata.json' },
+  { label: 'Extended Dataset 2', value: 'data2.json' },
+  { label: 'Extended Dataset 3', value: 'data3.json' },
 ]
 
 export default function Home() {
