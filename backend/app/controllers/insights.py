@@ -1,3 +1,4 @@
+import traceback
 from fastapi import APIRouter, HTTPException
 from app.repositories.feedback_repo import feedback_repo
 from app.services import ai_agent
@@ -16,6 +17,8 @@ def generate_insights():
         )
     try:
         report = ai_agent.generate_report(records)
+        return {"report": report}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"AI agent error: {str(e)}")
-    return {"report": report}
+        detail = f"{type(e).__name__}: {str(e)}"
+        print(f"[Signal360] /api/insights error:\n{traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=detail)
