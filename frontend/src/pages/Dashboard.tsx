@@ -16,9 +16,10 @@ import RiskForecast from '../components/RiskForecast'
 import AIRecommendations from '../components/AIRecommendations'
 import WordCloud from '../components/WordCloud'
 import TopicModeling from '../components/TopicModeling'
+import Integrations from './Integrations'
 import { sentimentColor } from '../lib/utils'
 
-const TABS = ['Overview', 'Trends', 'Events', 'Personas', 'Risks', 'Text Analysis', 'AI Report']
+const TABS = ['Overview', 'Trends', 'Events', 'Personas', 'Risks', 'Text Analysis', 'AI Report', 'Integrations']
 
 interface DashboardData {
   summary: Summary
@@ -119,7 +120,7 @@ export default function Dashboard() {
               S
             </div>
             <span className="font-semibold text-lg">Signal360</span>
-            <span className="text-gray-500 text-sm">— Nike Intelligence Dashboard</span>
+            <span className="text-gray-500 text-sm">— Intelligence Dashboard</span>
           </div>
           <button
             onClick={() => navigate('/')}
@@ -226,6 +227,8 @@ export default function Dashboard() {
         )}
 
         {tab === 'AI Report' && <AIRecommendations />}
+
+        {tab === 'Integrations' && <Integrations />}
       </div>
     </div>
   )

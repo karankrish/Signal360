@@ -52,8 +52,18 @@ export interface Summary {
 }
 
 export const apiClient = {
-  ingest: (filename = 'data.json.txt') =>
+  ingest: (filename = 'data.json') =>
     api.post<{ status: string; records_loaded: number }>(`/ingest?filename=${filename}`),
+
+  uploadFile: (file: File) => {
+    const form = new FormData()
+    form.append('file', file)
+    return api.post<{ status: string; records_loaded: number; file: string }>(
+      '/ingest/upload',
+      form,
+      { headers: { 'Content-Type': 'multipart/form-data' } }
+    )
+  },
 
   getSummary: () => api.get<Summary>('/summary'),
 

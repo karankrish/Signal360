@@ -1,5 +1,7 @@
 import os
-from fastapi import APIRouter, HTTPException, Query
+import json
+import tempfile
+from fastapi import APIRouter, HTTPException, Query, UploadFile, File
 from app.repositories.feedback_repo import feedback_repo
 from app.services.ingestion import load_and_preprocess
 from app.services import sentiment as sentiment_svc
@@ -21,6 +23,50 @@ def ingest_data(filename: str = Query(default="data.json")):
     records = sentiment_svc.analyze_batch(records)
     feedback_repo.load(records)
     return {"status": "ok", "records_loaded": len(records), "file": filename}
+
+
+@router.post("/ingest/upload")
+async def upload_and_ingest(file: UploadFile = File(...)):
+    """Accept a JSON file upload, process it, and load into memory."""
+    if not file.filename or not file.filename.lower().endswith((".json", ".txt")):
+        raise HTTPException(
+            status_code=400,
+            detail="Only .json or .txt files are accepted.",
+        )
+
+    contents = await file.read()
+
+    # Validate JSON
+    try:
+        data = json.loads(contents)
+    except json.JSONDecodeError as e:
+        raise HTTPException(status_code=422, detail=f"Invalid JSON: {str(e)}")
+
+    if not isinstance(data, list):
+        raise HTTPException(
+            status_code=422,
+            detail="JSON must be an array of feedback objects.",
+        )
+
+    # Write to temp file and process through the ingestion pipeline
+    with tempfile.NamedTemporaryFile(
+        mode="wb", suffix=".json", delete=False
+    ) as tmp:
+        tmp.write(contents)
+        tmp_path = tmp.name
+
+    try:
+        records = load_and_preprocess(tmp_path)
+        records = sentiment_svc.analyze_batch(records)
+        feedback_repo.load(records)
+    finally:
+        os.unlink(tmp_path)
+
+    return {
+        "status": "ok",
+        "records_loaded": len(records),
+        "file": file.filename,
+    }
 
 
 @router.get("/feedback")
